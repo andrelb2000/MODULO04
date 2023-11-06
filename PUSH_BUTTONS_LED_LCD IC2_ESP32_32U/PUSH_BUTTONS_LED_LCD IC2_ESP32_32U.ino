@@ -120,9 +120,9 @@ int lePino(int indice){
   int pinoPressionado = digitalRead(pinButton[indice]); 
   int foiPressionado = 0;
   if (pinoPressionado){
-    //( E1* ) --> ( E2 ) --> ( E3 ) --> ( E4 )
+    //( E1* ) --> ( E2 ) --> ( E3 )
     if (estadoPino[indice] == NAO_PRESSIONADO_NAO_TOCANDO){
-      //( E1 ) --> ( E2* ) --> ( E3 )--> ( E3 )  
+      //( E1 ) --> ( E2* ) --> ( E3 )
       estadoPino[indice] = PRESSIONADO_TOCANDO;    
     }      
   }
