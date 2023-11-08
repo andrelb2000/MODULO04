@@ -19,10 +19,6 @@ void setup() {
   }
   Serial.println("MMA8451 found!");
 
-  
- 
-
-
   //------------------------//
   lcd_i2c.init();
   lcd_i2c.backlight();
