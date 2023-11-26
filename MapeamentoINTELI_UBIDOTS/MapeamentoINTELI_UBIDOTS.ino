@@ -4,7 +4,6 @@
  ****************************************/
 #include "WiFi.h"
 #include "UbidotsEsp32Mqtt.h"
-
 /****************************************
  * Define Constants
  ****************************************/
@@ -15,12 +14,11 @@ const char *WIFI_SSID = "AMM_NOVOS_HORIZONTES_2G";      // Put here your Wi-Fi S
 const char *WIFI_PASS = "melissabraga";      // Put here your Wi-Fi password
 const char *DEVICE_LABEL = "2023_2b_m4_t10";   // Put here your Device label to which data  will be published
 const char VAR_ALUNO_DADOS[255] = "alunotest001"; // Put here your Variable label to which data  will be published
-
 const int PUBLISH_FREQUENCY = 5000; // Update rate in milliseconds
 unsigned long timer;
 char listaValorSinal[4048];
-float sinalAtelier1 = 10.001, sinalAtelier4  = 40.66, sinalR09      = 90.66, sinalLaboratorio = 77.66,
-      sinalAtelier8 = 80.18,  sinalAtelier12 = 12.12, sinalRecepcao = 13.66, sinalITBar = 22.22;
+float sinalAtelier1 = 0, sinalAtelier4  = 0, sinalR09      = 0, sinalLaboratorio = 0,
+      sinalAtelier8 = 0, sinalAtelier12 = 0, sinalRecepcao = 0, sinalITBar       = 0;
 int mainSignalValue = 1;
 int loopCounter = 1;
 int loopVarredura = 0;
@@ -28,6 +26,7 @@ int sequenciaAleatoria[10] = {0,1,2,3,4,5,6,7,8,9};
 char localVarredura[255] = "INICIO";
 Ubidots ubidots(UBIDOTS_TOKEN);
 
+// Reorganiza aleatoriamente a sequência de visitação dos pontos 
 void geraSeqAleatoria(){
   for (int i = 7; i > 0; i--) {
     int j = (rand() % (i + 1)) + 1;
@@ -36,7 +35,7 @@ void geraSeqAleatoria(){
     sequenciaAleatoria[j] = temp;
   }
 }
-
+//Passa para o próximo ponto de checagem
 void avancaChecagem(){
     loopVarredura++;  
     loopVarredura = loopVarredura % 10;
@@ -54,6 +53,7 @@ void avancaChecagem(){
       case 9:  strcpy(localVarredura,"FIM");         break;
     }
 }
+// Usa o valor atual de pontência de sinal e atribui ao ponto determinado
 void atribuiSinal(){
     mainSignalValue = WiFi.RSSI() + 70;
     switch(sequenciaAleatoria[loopVarredura]){
@@ -68,10 +68,7 @@ void atribuiSinal(){
     }
 }
 
-
-
-
-
+// Função de callback padrão - Não usada no momento
 void callback(char *topic, byte *payload, unsigned int length){
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -86,23 +83,22 @@ void callback(char *topic, byte *payload, unsigned int length){
  * Main Functions
  ****************************************/
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(115200);
   //ubidots.setDebug(true);  // uncomment this to make debug messages available
   ubidots.connectToWifi(WIFI_SSID, WIFI_PASS);
-  Serial.println("Apos a conexao");
   ubidots.setCallback(callback);
   ubidots.setup();
   ubidots.reconnect();
   timer = millis();
   geraSeqAleatoria();
 }
-
+//////////////////////////////////////////
 void loop() {
   if (!ubidots.connected())  {
     ubidots.reconnect();
   }
   if(loopVarredura < 9 ){
+    // Publica o valor atual do sinal no ponto determinado
     if ((millis() - timer) > PUBLISH_FREQUENCY){
       atribuiSinal();
       sprintf(listaValorSinal," \"atelier1\":%f, \"atelier4\":%f, \"atelier8\":%f, \"atelier12\":%f,\"atelierR9\":%f,\"itBAR\":%f,\"laboratorio\":%f,\"recepcao\":%f",  
