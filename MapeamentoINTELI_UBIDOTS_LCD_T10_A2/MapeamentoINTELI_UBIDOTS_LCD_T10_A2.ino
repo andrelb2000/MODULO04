@@ -19,7 +19,7 @@ const char *WIFI_SSID = "DIR-842-24G";      // Put here your Wi-Fi SSID
 const char *WIFI_PASS = "melissa_braga";      // Put here your Wi-Fi password
 
 const char *DEVICE_LABEL = "2023_2b_m4_t10";   // Put here your Device label to which data  will be published
-const char VAR_ALUNO_DADOS[255] = "alunotest001"; // Put here your Variable label to which data  will be published
+const char VAR_ALUNO_DADOS[255] = "alunotest002"; // Put here your Variable label to which data  will be published
 const int PUBLISH_FREQUENCY = 30000; // Update rate in milliseconds
 unsigned long timer;
 char listaValorSinal[4048];
@@ -112,7 +112,7 @@ void setup() {
   ubidots.setup();
   ubidots.reconnect();
   timer = millis()-PUBLISH_FREQUENCY;
-  srand((unsigned int)millis(NULL));
+  srand((unsigned int)millis());
   geraSeqAleatoria();
 }
 
