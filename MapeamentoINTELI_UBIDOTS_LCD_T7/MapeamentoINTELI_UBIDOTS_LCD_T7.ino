@@ -12,11 +12,11 @@
 /****************************************
  * Define Constants
  ****************************************/
-const char *UBIDOTS_TOKEN = "BBUS-kh3zxIvDhve3ZKsrVBjHNt4Ywqpmi9";  // Put here your Ubidots TOKEN
+const char *UBIDOTS_TOKEN = "BBUS-BfoSnxYqvATskbje5HR01TFwOx6F9e";  // Put here your Ubidots TOKEN
 const char *WIFI_SSID = "...";      // Put here your Wi-Fi SSID
 const char *WIFI_PASS = "...";      // Put here your Wi-Fi password
 
-const char *DEVICE_LABEL = "2023_2b_m4_t10";   // Put here your Device label to which data  will be published
+const char *DEVICE_LABEL = "2023_2b_m4_t7";   // Put here your Device label to which data  will be published
 const char VAR_ALUNO_DADOS[255] = "alunotestXXX"; // Put here your Variable label to which data  will be published
 const int PUBLISH_FREQUENCY = 240000; // Tempo em cada estação em Milisegundos
 unsigned long timer;
@@ -110,7 +110,7 @@ void setup() {
   ubidots.setup();
   ubidots.reconnect();
   timer = millis()-PUBLISH_FREQUENCY;
-  srand((unsigned int)millis(NULL));
+  srand((unsigned int)millis());
   geraSeqAleatoria();
 }
 
@@ -118,10 +118,18 @@ void setup() {
 void loop() {
   int connectProb = 0;
   while (!ubidots.connected())  {
-    ubidots.reconnect();
-    connectProb++;
     Serial.print("Problemas e reconectando no inicio do LOOP - ");
-    Serial.println(connectProb);
+    Serial.println(connectProb);    
+    connectProb++;
+    lcd_i2c.setCursor(0,0);
+    lcd_i2c.print("Prob.Recon.LOOP");
+    lcd_i2c.setCursor(0,1);
+    lcd_i2c.printf("Tent.Reconectar");
+    delay(100);
+    ubidots.reconnect();
+    lcd_i2c.setCursor(0,1);
+    lcd_i2c.printf("Reconectando %2i",connectProb);
+    delay(100); 
   }
   if(loopVarredura < 9 ){
     // Publica o valor atual do sinal no ponto determinado
@@ -139,11 +147,19 @@ void loop() {
       ubidots.add(VAR_ALUNO_DADOS, mainSignalValue ,listaValorSinal);
       Serial.println(listaValorSinal);
       connectProb = 0;
-      while (!ubidots.connected())  {
-        ubidots.reconnect();
+      while (!ubidots.connected())  {        
         connectProb++;
         Serial.print("Problemas e reconectando antes da publicacao - ");
         Serial.println(connectProb);
+        lcd_i2c.setCursor(0,0);
+        lcd_i2c.print("Prob.Reconex.Pub");
+        lcd_i2c.setCursor(0,1);
+        lcd_i2c.printf("Tent.Reconectar");
+        delay(100);
+        ubidots.reconnect();
+        lcd_i2c.setCursor(0,1);
+        lcd_i2c.printf("Reconectando %2i",connectProb);
+        delay(100);               
       }
       ubidots.publish(DEVICE_LABEL);
       delay(10000);
